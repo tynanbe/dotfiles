@@ -1,0 +1,16 @@
+config:
+  backup: false
+  banner: false
+  create: true
+  dotpath: src
+  keepdot: false
+  link_dotfile_default: link
+  link_on_import: link
+  longkey: true
+  showdiff: true
+
+
+dotfiles:
+
+
+profiles:
