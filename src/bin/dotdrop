@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+
+
+{ "${HOME}/src/dotfiles/dotdrop.sh" "${@}"
+}
+
+
+exit 0

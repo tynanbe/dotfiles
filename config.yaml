@@ -2,15 +2,25 @@ config:
   backup: false
   banner: false
   create: true
+  diff_command: 'icdiff -r {0} {1}'
   dotpath: src
   keepdot: false
   link_dotfile_default: link
   link_on_import: link
   longkey: true
   showdiff: true
-
-
 dotfiles:
-
-
+  f_bin_dotdrop:
+    src: bin/dotdrop
+    dst: ~/bin/dotdrop
+    chmod: '755'
 profiles:
+  oak:
+    dotfiles:
+    - ALL
+  eucalyptus:
+    dotfiles:
+    - ALL
+  pawpaw:
+    dotfiles:
+    - ALL
