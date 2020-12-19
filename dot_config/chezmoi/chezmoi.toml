@@ -1,0 +1,18 @@
+# chezmoi.toml
+
+
+sourceDir = "/home/tynanbe/src/dotfiles"
+
+
+[cd]
+  command = "bash"
+
+
+[diff]
+  format = "git"
+  pager = "delta"
+
+
+[merge]
+  command = "nvim"
+  args = "-d"
