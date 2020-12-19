@@ -1,6 +1,0 @@
-#!/usr/bin/env sh
-
-# dotdrop - Alias for `~/src/dotfiles/dotdrop.sh`
-
-
-"${HOME}/src/dotfiles/dotdrop.sh" "${@}"
