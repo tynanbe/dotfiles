@@ -18,6 +18,9 @@ dotfiles:
     src: profile
     dst: ~/.profile
     chmod: '755'
+  f_gitconfig:
+    src: gitconfig
+    dst: ~/.gitconfig
 profiles:
   oak:
     dotfiles:
