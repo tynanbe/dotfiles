@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+
+export PATH="${HOME}/.cargo/bin:${HOME}/bin:${PATH}:/srv/bin"
+
+export EDITOR=vis
+
+export FZF_DEFAULT_COMMAND="fd --type file --hidden --follow --exclude .git"
+
+export DOTDROP_AUTOUPDATE=no
+
+# ENV loads on every interactive shell invocation.
+export ENV="${HOME}/.config/dash/dashrc"
