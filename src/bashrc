@@ -16,7 +16,13 @@ PS1='[\u@\h \W]\$ '
 
 # Sources
 
-. "${HOME}/src/dotfiles/dotdrop/completion/dotdrop-completion.bash"
+safe_source() {
+  test -f "${1}" \
+  && . "${1}"
+}
 
-. "${HOME}/.asdf/asdf.sh"
-. "${HOME}/.asdf/completions/asdf.bash"
+safe_source "${HOME}/src/dotfiles/dotdrop/completion/dotdrop-completion.bash"
+
+safe_source "${HOME}/.asdf/asdf.sh"
+
+safe_source "${HOME}/.asdf/completions/asdf.bash"
