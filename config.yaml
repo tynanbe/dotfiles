@@ -14,6 +14,8 @@ dotfiles:
     src: bin/dotdrop
     dst: ~/bin/dotdrop
     chmod: '755'
+    actions:
+      - ln ~/bin/dotdrop .drop
   f_profile:
     src: profile
     dst: ~/.profile
@@ -31,3 +33,6 @@ profiles:
   pawpaw:
     dotfiles:
     - ALL
+actions:
+  post:
+    ln: cd $(dirname {0}) && ln --force --symbolic $(basename {0}) {1}
