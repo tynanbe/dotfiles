@@ -28,6 +28,10 @@ dotfiles:
     chmod: '755'
     actions:
     - ln ~/bin/dotdrop .drop
+  f_dircolors:
+    src: dircolors
+    dst: ~/.dircolors
+    chmod: '644'
   f_gitconfig:
     src: gitconfig
     dst: ~/.gitconfig
