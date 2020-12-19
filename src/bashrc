@@ -1,0 +1,22 @@
+# .bashrc
+
+
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+
+# Prompt
+PS1='[\u@\h \W]\$ '
+
+
+# Aliases
+
+#alias ls="ls --color=auto"
+
+
+# Sources
+
+. "${HOME}/src/dotfiles/dotdrop/completion/dotdrop-completion.bash"
+
+. "${HOME}/.asdf/asdf.sh"
+. "${HOME}/.asdf/completions/asdf.bash"

@@ -10,19 +10,32 @@ config:
   longkey: true
   showdiff: true
 dotfiles:
+  f_bash_logout:
+    src: bash_logout
+    dst: ~/.bash_logout
+    chmod: '644'
+  f_bash_profile:
+    src: bash_profile
+    dst: ~/.bash_profile
+    chmod: '644'
+  f_bashrc:
+    src: bashrc
+    dst: ~/.bashrc
+    chmod: '644'
   f_bin_dotdrop:
     src: bin/dotdrop
     dst: ~/bin/dotdrop
     chmod: '755'
     actions:
-      - ln ~/bin/dotdrop .drop
+    - ln ~/bin/dotdrop .drop
+  f_gitconfig:
+    src: gitconfig
+    dst: ~/.gitconfig
+    chmod: '644'
   f_profile:
     src: profile
     dst: ~/.profile
     chmod: '755'
-  f_gitconfig:
-    src: gitconfig
-    dst: ~/.gitconfig
 profiles:
   oak:
     dotfiles:
