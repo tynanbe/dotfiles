@@ -1,0 +1,6 @@
+# .bash_profile
+
+
+# Get aliases and functions
+test -f "${HOME}/.bashrc" \
+&& . "${HOME}/.bashrc"

@@ -1,0 +1,28 @@
+# .bashrc
+
+
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+
+# Prompt
+PS1='[\u@\h \W]\$ '
+
+
+# Aliases
+
+#alias ls="ls --color=auto"
+
+
+# Sources
+
+safe_source() {
+  test -f "${1}" \
+  && . "${1}"
+}
+
+safe_source "${HOME}/src/dotfiles/dotdrop/completion/dotdrop-completion.bash"
+
+safe_source "${HOME}/.asdf/asdf.sh"
+
+safe_source "${HOME}/.asdf/completions/asdf.bash"
