@@ -12,9 +12,11 @@ function fish_greeting -d "what's up, fish?"
 
     #set_color normal
 
-    greeting
+    command --quiet --search greeting
+    and greeting
 
-    #fish_logo red brred yellow
+    #command --quiet --search fish_logo
+    #and fish_logo red brred yellow
     #echo -e "\n                      "(fish -v)
 
   else
