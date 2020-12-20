@@ -25,3 +25,7 @@ safe_source "${HOME}/.config/bash/completions/chezmoi.bash"
 
 safe_source "${HOME}/.asdf/asdf.sh"
 safe_source "${HOME}/.asdf/completions/asdf.bash"
+
+
+# Prompt
+eval "$(starship init bash)"
