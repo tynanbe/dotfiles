@@ -4,6 +4,8 @@
 add_newline = false
 format = """
 \n\n\
+$time\
+$custom\
 $username\
 $hostname\
 $shlvl\
@@ -40,19 +42,17 @@ $terraform\
 $zig\
 $nix_shell\
 $conda\
-$memory_usage\
 $aws\
 $gcloud\
 $openstack\
 $env_var\
 $crystal\
-$custom\
+$lua\
+$memory_usage\
+$battery\
 $cmd_duration\
 $line_break\
-$lua\
 $jobs\
-$battery\
-$time\
 $status\
 $character\
 """
@@ -113,7 +113,7 @@ symbol = "!"
 disabled = false
 format = "[$time]($style)"
 style = "bold black"
-time_format = "%b %_d, %_H:%M:%S%n"
+time_format = "%b %d, %H:%M:%S%n"
 
 
 [username]
