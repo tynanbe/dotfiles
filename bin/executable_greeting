@@ -15,5 +15,5 @@
 
 
 command -v neofetch > /dev/null \
-&& neofetch \
-&& echo
+&& echo \
+&& neofetch
