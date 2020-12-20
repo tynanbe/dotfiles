@@ -3,11 +3,12 @@
 
 export PATH="${HOME}/.cargo/bin:${HOME}/bin:${PATH}:/srv/bin"
 
-export EDITOR=vis
+export EDITOR="vis"
+export VISUAL="${EDITOR}"
 
 export FZF_DEFAULT_COMMAND="fd --type file --hidden --follow --exclude .git"
 
-export STARSHIP_CACHE=/dev/null
+export STARSHIP_CACHE="/dev/null"
 
 
 # ENV loads on every interactive shell invocation.
