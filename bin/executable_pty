@@ -1,0 +1,108 @@
+#!/usr/bin/env python
+
+from sys import argv
+import os
+import signal
+import textwrap
+
+
+# I've had problems with python's File objects at this low a level, so
+# we're going to use integers to specify all files in this script.
+
+stdin = 0
+stdout = 1
+stderr = 2
+
+
+if len(argv) < 2:
+    os.write(
+        stderr
+        , textwrap.dedent(
+            """
+            pty - pseudoterminal
+
+            A tragically beautiful piece of hackery, made to fool programs like ls,
+            grep, rg, and fd into thinking they're actually connected to a terminal.
+
+            <https://unix.stackexchange.com/a/564841>
+
+
+            USAGE:
+                pty command [arg1 arg2 ...]
+
+            EXAMPLES:
+                pty ls --color -R | less -r
+                git log -p | pty rg <search terms> | less -r
+
+            """
+        )
+        .encode()
+    )
+
+    exit(255)
+
+
+# We do not use forkpty here because it would block ^Cs from reaching the
+# child process. And we don't need that.
+
+ptm, pts = os.openpty()
+pid = os.fork()
+
+if pid == 0:
+    # The child runs this.
+    # To get the behaviour we want, we only need to replace the process's
+    # stdout with pts. Everything else should remain in place, so that things
+    # like `ps -eF | pty rg python | less -r` will still work as intended.
+
+    os.dup2(pts, stdout)
+
+    # This is not like a subprocess.call(). It replaces the entire child
+    # process with argv[1:], meaning execvp will not return! Web search
+    # "fork exec" for more.
+
+    os.execvp(argv[1], argv[1:])
+
+
+# The parent runs this.
+
+
+# If the parent doesn't close the slave end, the script won't be able to
+# exit. The next read on ptm after the child process terminates would hang
+# forever because pts would technically still be open.
+
+os.close(pts)
+
+
+# The whole process group gets SIGINT, including the child, so we don't need
+# to react to it. We'll know when to leave, judging by what the child does.
+
+signal.signal(signal.SIGINT, signal.SIG_IGN)
+
+
+while True:
+    try:
+        chunk = os.read(ptm, 4096)
+
+    except OSError:
+        break
+
+    try:
+        os.write(stdout, chunk)
+
+    except BrokenPipeError:
+        # This happens when the parent is piping output to another process in a
+        # pipeline, like in `pty ls --color -R | less -r`, and the receiving
+        # process is terminated before the child has exited. If the receiving
+        # process is less, this can happen very easily. It happens every time
+        # the user decides to quit less before it has displayed all output. So,
+        # we need to stop the child process now.
+
+        os.kill(pid, signal.SIGTERM)
+
+        break
+
+
+wait_pid, status = os.waitpid(pid, 0)
+
+
+exit(status >> 8)
