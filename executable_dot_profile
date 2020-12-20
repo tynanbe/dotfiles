@@ -7,7 +7,7 @@ export EDITOR=vis
 
 export FZF_DEFAULT_COMMAND="fd --type file --hidden --follow --exclude .git"
 
-export DOTDROP_AUTOUPDATE=no
+export STARSHIP_CACHE=/dev/null
 
 
 # ENV loads on every interactive shell invocation.
