@@ -27,5 +27,9 @@ safe_source "${HOME}/.asdf/asdf.sh"
 safe_source "${HOME}/.asdf/completions/asdf.bash"
 
 
+command -v greeting > /dev/null \
+&& greeting
+
+
 # Prompt
 eval "$(starship init bash)"
