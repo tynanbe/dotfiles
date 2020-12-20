@@ -21,8 +21,7 @@ safe_source() {
   && . "${1}"
 }
 
-safe_source "${HOME}/src/dotfiles/dotdrop/completion/dotdrop-completion.bash"
+safe_source "${HOME}/.config/bash/completions/chezmoi.bash"
 
 safe_source "${HOME}/.asdf/asdf.sh"
-
 safe_source "${HOME}/.asdf/completions/asdf.bash"
