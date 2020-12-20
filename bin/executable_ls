@@ -1,0 +1,47 @@
+#!/usr/bin/env sh
+
+# ls - a modern replacement for ls
+#
+# A cross-platform alias with common options specified as the default.
+#
+#
+# USAGE:
+#   ls [OPTIONS] [<PATHS>]
+#
+
+
+long_opts() {
+  while test 0 -lt ${#}; do
+    case "${1}" in
+      -1|--oneline|-G|--grid|-x|--across)
+        return 0
+        ;;
+    esac
+
+    shift
+  done
+
+  printf "%s " \
+    --long \
+    --group \
+    --time-style=iso
+}
+
+
+args=$(
+  if test 0 -lt ${#}; then
+    printf '"%s" ' "${@}" \
+      | sed -E \
+        -e 's/"--human-readable"//' \
+        -e 's/--directory/--list-dirs/'
+  fi
+)
+
+
+sh -c "
+  exa \
+    --all \
+    --classify \
+    $(long_opts "${@}") \
+    ${args}
+"

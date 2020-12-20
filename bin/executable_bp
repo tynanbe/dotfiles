@@ -1,0 +1,54 @@
+#!/usr/bin/env sh
+
+# bp - bat pager
+#
+# Use bat to page through stdin or a given file
+# with syntax highlighting and line numbers.
+#
+#
+# USAGE:
+#   bp [OPTIONS] [<PATH|STRING>]
+#
+# Reads from stdin if no PATH|STRING is given.
+#
+#
+# OPTIONS:
+#
+#  -
+#
+#      Read from stdin.
+#
+#  -e, --exec <command>
+#
+#      `exec` the given STRING before paging.
+#
+
+
+bat_opts=$(printf "%s " \
+  --color always \
+  --paging always \
+  --style numbers
+)
+
+
+if $(test -z "${1}" \
+|| test "-" = "${1}"); then
+  bat ${bat_opts} "/dev/stdin"
+
+elif $(test "-e" = "${1}" \
+|| test "--exec" = "${1}"); then
+  shift
+
+  sh -c "
+    pty \
+      $(printf '"%s" ' "${@}") \
+    | bat ${bat_opts}
+  "
+
+elif test -f "${1}"; then
+  bat ${bat_opts} "${@}"
+
+else
+  printf "%b" "${@}" \
+  | bat ${bat_opts}
+fi

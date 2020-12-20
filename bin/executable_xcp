@@ -1,0 +1,17 @@
+#!/usr/bin/env sh
+
+# xcp - X copy
+#
+# Copy stdin to an X server's PRIMARY and CLIPBOARD selections.
+#
+#
+# USAGE:
+#   xcp <STRING>
+#
+
+
+xsel -ip "${@}"
+
+
+xsel -op \
+| xsel -ib

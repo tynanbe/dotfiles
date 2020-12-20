@@ -1,0 +1,35 @@
+#!/usr/bin/env sh
+
+# xdopaste - Use xdotool and xsel to paste arbitrary text, e.g. from hotkeys
+
+
+PRIMARY=$(
+  xsel -op
+)
+
+
+CLIPBOARD=$(
+  xsel -ob
+)
+
+
+printf "%s" "await" \
+| xsel -is
+
+
+printf "%b" "${@}" \
+| xcp
+
+
+xdotool key Shift+Insert \
+&& sleep 0.5 \
+&& xsel -cs
+
+
+if test -z "$(xsel -os)"; then
+  printf "%s" "${PRIMARY}" \
+  | xsel -ip
+
+  printf "%s" "${CLIPBOARD}" \
+  | xsel -ib
+fi

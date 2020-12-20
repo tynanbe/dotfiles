@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+# xx - X selection transfer
+#
+# Copy an X server's CLIPBOARD selection to its PRIMARY selection.
+#
+#
+# USAGE:
+#   xx
+#
+
+
+xsel -ob \
+| xsel -ip

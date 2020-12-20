@@ -1,0 +1,41 @@
+#!/usr/bin/env sh
+
+# cpo - colorparse out
+#
+# Parse a color configuration string (in Git syntax) and pass it,
+# optionally after applying it to a given string, to stdout
+# as an ANSI color escape sequence.
+#
+# If a string is provided, the ANSI reset sequence will be appended.
+#
+#
+# USAGE:
+#   cpo <COLOR> [TEXT]
+#
+#
+# COLOR:
+#  <https://git-scm.com/docs/git-config#Documentation/git-config.txt-color>
+#
+
+
+normal="\033[0m"
+
+
+parsed=$(
+  git config --get-color nil "${1}"
+)
+
+
+if test -z "${parsed}"; then
+  printf "%b" "${normal}"
+
+else
+  printf "%b" "${parsed}"
+fi
+
+
+if test 1 -lt ${#}; then
+  shift
+
+  printf "%b" "${@}${normal}\n"
+fi
