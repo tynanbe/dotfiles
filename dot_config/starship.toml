@@ -1,0 +1,123 @@
+# starship.toml
+
+
+add_newline = false
+format = """
+\n\n\
+$username\
+$hostname\
+$shlvl\
+$kubernetes\
+$directory\
+$git_branch\
+$git_commit\
+$git_state\
+$git_status\
+$hg_branch\
+$docker_context\
+$package\
+$cmake\
+$dart\
+$dotnet\
+$elixir\
+$elm\
+$erlang\
+$golang\
+$helm\
+$java\
+$julia\
+$nim\
+$nodejs\
+$ocaml\
+$perl\
+$php\
+$purescript\
+$python\
+$ruby\
+$rust\
+$swift\
+$terraform\
+$zig\
+$nix_shell\
+$conda\
+$memory_usage\
+$aws\
+$gcloud\
+$openstack\
+$env_var\
+$crystal\
+$custom\
+$cmd_duration\
+$line_break\
+$lua\
+$jobs\
+$battery\
+$time\
+$status\
+$character\
+"""
+
+
+[character]
+error_symbol = "[:](bold red)"
+format = "$symbol "
+success_symbol = "[:](bold green)"
+vicmd_symbol = "[ ](bold green)"
+
+
+[cmd_duration]
+format = "[$duration]($style) "
+min_time = 2_000
+min_time_to_notify = 45_000
+show_notifications = false
+style = "bold black"
+
+
+[directory]
+fish_style_pwd_dir_length = 1
+format = "[$path]($style)[$read_only]($read_only_style) "
+read_only = "~"
+read_only_style = "red"
+style = "bold cyan"
+truncate_to_repo = true
+truncation_length = 2
+truncation_symbol = ".../"
+
+
+[hostname]
+format = "[$hostname]($style) in "
+ssh_only = true
+style = "bold dimmed green"
+trim_at = "."
+
+
+[line_break]
+disabled = false
+
+
+[memory]
+disabled = true
+format = "$symbol [${ram_pct}(${swap_pct})]($style) "
+style = "bold dimmed white"
+threshold = 80
+
+
+[status]
+disabled = true
+format = "[$symbol$status]($style)"
+style = "bold red"
+symbol = "!"
+
+
+[time]
+disabled = false
+format = "[$time]($style)"
+style = "bold black"
+time_format = "%b %_d, %_H:%M:%S%n"
+
+
+[username]
+format = "[$user]($style)@"
+show_always = false
+style_root = "bold red"
+style_user = "bold yellow"
