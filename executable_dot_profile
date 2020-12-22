@@ -3,10 +3,13 @@
 
 export PATH="${HOME}/.cargo/bin:${HOME}/bin:${PATH}:/srv/bin"
 
-export EDITOR="vis"
-export VISUAL="${EDITOR}"
+editor="vis"
+command -v ${editor} > /dev/null \
+&& export EDITOR="${editor}" \
+&& export VISUAL="${editor}"
 
-export FZF_DEFAULT_COMMAND="fd --type file --hidden --follow --exclude .git"
+command -v fd > /dev/null \
+&& export FZF_DEFAULT_COMMAND="fd --type file --hidden --follow --exclude .git"
 
 export STARSHIP_CACHE="/tmp/starship"
 
