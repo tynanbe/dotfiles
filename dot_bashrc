@@ -22,6 +22,11 @@ safe_source() {
 }
 
 safe_source "${HOME}/.config/bash/completions/chezmoi.bash"
+if test "builtin" = $(type -t compopt); then
+  complete -o default -F __start_chezmoi dot
+else
+  complete -o default -o nospace -F __start_chezmoi dot
+fi
 
 safe_source "${HOME}/.asdf/asdf.sh"
 safe_source "${HOME}/.asdf/completions/asdf.bash"
