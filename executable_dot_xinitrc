@@ -1,0 +1,60 @@
+#!/usr/bin/env sh
+
+
+export DISPLAY=:0
+
+export XDG_CONFIG_HOME="${HOME}/.config"
+
+export SXHKD_SHELL="/bin/sh"
+
+
+command -v xrdb > /dev/null \
+&& test -f "${HOME}/.Xresources" \
+&& xrdb -load "${HOME}/.Xresources"
+
+
+# Wallpaper
+command -v hsetroot > /dev/null \
+&& hsetroot -cover "${HOME}/Pictures/spacegazer.jpg"
+
+
+# Keyboard
+command -v xset > /dev/null \
+&& xset r rate 200 30
+
+
+# Mouse
+
+command -v xsetroot > /dev/null \
+&& xsetroot -cursor_name left_ptr &
+
+command -v unclutter > /dev/null \
+&& unclutter \
+    --timeout 1 \
+    --jitter 5 \
+    --ignore-scrolling \
+    --fork
+
+
+# Compositor
+compositor="picom"
+command -v ${compositor} > /dev/null \
+&& ${compositor} &
+
+
+# Music Player
+command -v mpd > /dev/null \
+&& test ! -s "${HOME}/.config/mpd/pid" \
+&& mpd
+
+
+# Hotkeys
+hotkeys="sxhkd"
+command -v ${hotkeys} > /dev/null \
+&& ${hotkeys} &
+
+
+# Window Manager
+wm="bspwm"
+command -v ${wm} > /dev/null \
+&& exec ${wm}
