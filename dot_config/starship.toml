@@ -3,7 +3,10 @@
 
 add_newline = false
 format = """
-\n\n\
+$cmd_duration\
+$line_break\
+$line_break\
+$line_break\
 $time\
 $custom\
 $username\
@@ -50,7 +53,6 @@ $crystal\
 $lua\
 $memory_usage\
 $battery\
-$cmd_duration\
 $line_break\
 $jobs\
 $status\
@@ -67,7 +69,7 @@ vicmd_symbol = "[ ](bold green)"
 
 [cmd_duration]
 format = "[$duration]($style) "
-min_time = 2_000
+min_time = 0
 min_time_to_notify = 45_000
 show_notifications = false
 style = "bold black"
