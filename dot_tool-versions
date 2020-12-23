@@ -9,7 +9,7 @@ haskell system
 java system
 lua system
 luaJIT system
-nodejs system
+nodejs 15.5.0
 ocaml system
 php system
 python system
