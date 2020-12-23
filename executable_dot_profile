@@ -13,6 +13,8 @@ command -v fd > /dev/null \
 
 export STARSHIP_CACHE="/tmp/starship"
 
+export ASDF_NPM_DEFAULT_PACKAGES_FILE="${HOME}/.config/asdf/default-npm-packages"
+
 
 # ENV loads on every interactive shell invocation.
 
