@@ -1,0 +1,12 @@
+css-in-elm
+
+{{- /* elm-format fails on musl systems,
+       install it via `nix-env` instead
+*/ -}}
+{{- if (eq "oak" .chezmoi.hostname) }}
+{{ "elm-format" }}
+{{- end -}}
+
+{{""}}
+elm-test
+servor
