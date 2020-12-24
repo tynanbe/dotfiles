@@ -78,12 +78,21 @@ style = "bold black"
 [directory]
 fish_style_pwd_dir_length = 1
 format = "[$path]($style)[$read_only]($read_only_style) "
-read_only = "~"
+read_only = " 🔒"
 read_only_style = "red"
 style = "bold cyan"
 truncate_to_repo = true
 truncation_length = 2
-truncation_symbol = ".../"
+truncation_symbol = "…/"
+
+
+[git_branch]
+always_show_remote = false
+format = "[$symbol$branch]($style) "
+only_attached = false
+style = "bold purple"
+symbol = " "
+truncation_symbol = "…"
 
 
 [hostname]
