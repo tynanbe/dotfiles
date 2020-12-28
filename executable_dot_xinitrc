@@ -36,6 +36,11 @@ command -v unclutter > /dev/null \
     --fork
 
 
+# GPU Fan Control
+command -v nvfancontrol > /dev/null \
+&& nvfancontrol --force --limits 0 &
+
+
 # Compositor
 compositor="picom"
 command -v ${compositor} > /dev/null \
