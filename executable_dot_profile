@@ -22,3 +22,9 @@ shellrc="${HOME}/.config/dash/dashrc"
 
 test -f "${shellrc}" \
 && export ENV="${shellrc}"
+
+
+# Run pulseaudio for the duration of the login session
+command -v pulseaudio > /dev/null \
+&& pulseaudio --exit-idle-time=-1 --start \
+&& trap "pulseaudio --kill" EXIT
