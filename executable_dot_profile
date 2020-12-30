@@ -1,12 +1,17 @@
 #!/usr/bin/env sh
 
 
+# Universal variables
+
 export PATH="${HOME}/.cargo/bin:${HOME}/bin:${PATH}:/srv/bin"
 
 editor="vis"
 command -v ${editor} > /dev/null \
 && export EDITOR="${editor}" \
 && export VISUAL="${editor}"
+
+
+# Command-specific variables
 
 command -v fd > /dev/null \
 && export FZF_DEFAULT_COMMAND="fd --type file --hidden --follow --exclude .git"
@@ -16,10 +21,8 @@ export STARSHIP_CACHE="/tmp/starship"
 export ASDF_NPM_DEFAULT_PACKAGES_FILE="${HOME}/.config/asdf/default-npm-packages"
 
 
-# ENV loads on every interactive shell invocation.
-
+# ENV command - loads on every interactive shell invocation
 shellrc="${HOME}/.config/dash/dashrc"
-
 test -f "${shellrc}" \
 && export ENV="${shellrc}"
 
