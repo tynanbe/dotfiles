@@ -27,7 +27,37 @@ test -f "${shellrc}" \
 && export ENV="${shellrc}"
 
 
+on_logout=
+
+on_logout() {
+  test -n "${on_logout}" \
+  && on_logout="${on_logout}; "
+
+  on_logout="${on_logout}${@}"
+}
+
+
 # Run pulseaudio for the duration of the login session
-command -v pulseaudio > /dev/null \
-&& pulseaudio --exit-idle-time=-1 --start \
-&& trap "pulseaudio --kill" EXIT
+if command -v pulseaudio > /dev/null; then
+  pulseaudio --check \
+  && pulseaudio --kill
+
+  pulseaudio --exit-idle-time=-1 --start
+
+  on_logout "pulseaudio --check && pulseaudio --kill"
+fi
+
+
+# Run music player for the duration of the login session
+if command -v mpd > /dev/null; then
+  pid="${HOME}/.config/mpd/pid"
+
+  test ! -s "${pid}" \
+  && mpd
+
+  on_logout "test -s \"${pid}\" && mpd --kill"
+fi
+
+
+test -n "${on_logout}" \
+&& trap "${on_logout}" EXIT

@@ -47,12 +47,6 @@ command -v ${compositor} > /dev/null \
 && ${compositor} &
 
 
-# Music Player
-command -v mpd > /dev/null \
-&& test ! -s "${HOME}/.config/mpd/pid" \
-&& mpd
-
-
 # Hotkeys
 hotkeys="sxhkd"
 command -v ${hotkeys} > /dev/null \
