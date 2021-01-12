@@ -32,6 +32,7 @@ args=$(
   if test 0 -lt ${#}; then
     printf '"%s" ' "${@}" \
       | sed -E \
+        -e 's/"--almost-all"|"-A"|("-[^"-A]*)A/\1/' \
         -e 's/"--human-readable"//' \
         -e 's/--directory/--list-dirs/'
   fi
