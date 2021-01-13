@@ -11,72 +11,74 @@
 
 
 usage() {
-  echo "${name} - ZFS Mountpoint"
-  echo
-  echo "A convenient wrapper for working with ZFS mountpoints."
-  echo
-  echo "  - Create a ZFS filesystem, and optionally its parents, as needed."
-  echo "  - Backup and preserve files if the mountpoint already exists."
-  echo "  - Set the ZFS filesystem's mountpoint."
-  echo
-  echo "USAGE:"
-  echo "  ${name} [OPTIONS] FILESYSTEM"
-  echo
-  echo "  All options and their arguments must be space-delimited; other formats --"
-  echo "  e.g. \`-fN\`, \`-P/home\`, \`--path=run\`, etc. -- are not supported."
-  echo
-  echo "GENERAL OPTIONS:"
-  echo "  --                    end options"
-  echo "  -f, --force           never prompt"
-  echo "  -h, --help            show list of command-line options"
-  echo
-  echo "  Use \"--\" to indicate that all following arguments are non-options."
-  echo
-  echo "  The \`--force\` option assumes affirmative intent in situations where the"
-  echo "  user would normally be prompted about FILESYSTEM creation or backup removal."
-  echo
-  echo "MOUNTPOINT OPTIONS:"
-  echo "  -I, --inherit         unset the ZFS mountpoint"
-  echo "  -L, --legacy          set the ZFS mountpoint to \"legacy\""
-  echo "  -N, --none            set the ZFS mountpoint to \"none\""
-  echo "  -P PATH, --path PATH  set the ZFS mountpoint to PATH"
-  echo
-  echo "  Mountpoint options are mutually exclusive."
-  echo
-  echo "  If PATH is not absolute, it will be made so before use."
-  echo
-  echo "  Omitting all mountpoint options is equivalent to using \`--path PATH\`,"
-  echo "  where PATH is the FILESYSTEM argument with the zpool name removed."
-  echo
-  echo "  Example:"
-  echo "    \`${name} rpool/home\`"
-  echo "    equates to"
-  echo "    \`${name} --path /home rpool/home\`"
-  echo
-  echo "META OPTIONS:"
-  echo "  -M MODE, --mode MODE    apply \`chmod MODE\` to the mountpoint"
-  echo "  -O [OWNER][:[GROUP]], --own [OWNER][:[GROUP]]"
-  echo "                          apply \`chown [OWNER][:[GROUP]]\` to the mountpoint"
-  echo
-  echo "  Meta options cannot be used together with any of the following options:"
-  echo "    --inherit (-I)"
-  echo "    --legacy (-L)"
-  echo "    --none (-N)"
-  echo
-  echo "ZFS-CREATE OPTIONS:"
-  echo "  -o property=value [...]   set one or more ZFS properties"
-  echo "  -p, --parents             create any non-existing parent datasets"
-  echo
-  echo "  \`zfs create\` is only invoked on an as-needed basis."
-  echo "  As such, zfs-create options have no effect if FILESYSTEM already exists."
-  echo
-  echo "  Multiple \`-o property=value\` options can be specified."
-  echo
-  echo "  Note that using \`-o mountpoint=PATH\` is not recommended. Instead users"
-  echo "  should prefer the \`--path PATH\` mountpoint option described above."
-  echo
-  echo "SEE ALSO"
-  echo "  zfs-create(8), zfs-set(8), zfsprops(8)"
+  cat <<EOF
+${name} - ZFS Mountpoint
+
+A convenient wrapper for working with ZFS mountpoints.
+
+  - Create a ZFS filesystem, and optionally its parents, as needed.
+  - Backup and preserve files if the mountpoint already exists.
+  - Set the ZFS filesystem's mountpoint.
+
+USAGE:
+  ${name} [OPTIONS] FILESYSTEM
+
+  All options and their arguments must be space-delimited; other formats --
+  e.g. \`-fN\`, \`-P/home\`, \`--path=run\`, etc. -- are not supported.
+
+GENERAL OPTIONS:
+  --                    end options
+  -f, --force           never prompt
+  -h, --help            show list of command-line options
+
+  Use \"--\" to indicate that all following arguments are non-options.
+
+  The \`--force\` option assumes affirmative intent in situations where the
+  user would normally be prompted about FILESYSTEM creation or backup removal.
+
+MOUNTPOINT OPTIONS:
+  -I, --inherit         unset the ZFS mountpoint
+  -L, --legacy          set the ZFS mountpoint to \"legacy\"
+  -N, --none            set the ZFS mountpoint to \"none\"
+  -P PATH, --path PATH  set the ZFS mountpoint to PATH
+
+  Mountpoint options are mutually exclusive.
+
+  If PATH is not absolute, it will be made so before use.
+
+  Omitting all mountpoint options is equivalent to using \`--path PATH\`,
+  where PATH is the FILESYSTEM argument with the zpool name removed.
+
+  Example:
+    \`${name} rpool/home\`
+    equates to
+    \`${name} --path /home rpool/home\`
+
+META OPTIONS:
+  -M MODE, --mode MODE    apply \`chmod MODE\` to the mountpoint
+  -O [OWNER][:[GROUP]], --own [OWNER][:[GROUP]]
+                          apply \`chown [OWNER][:[GROUP]]\` to the mountpoint
+
+  Meta options cannot be used together with any of the following options:
+    --inherit (-I)
+    --legacy (-L)
+    --none (-N)
+
+ZFS-CREATE OPTIONS:
+  -o property=value [...]   set one or more ZFS properties
+  -p, --parents             create any non-existing parent datasets
+
+  \`zfs create\` is only invoked on an as-needed basis.
+  As such, zfs-create options have no effect if FILESYSTEM already exists.
+
+  Multiple \`-o property=value\` options can be specified.
+
+  Note that using \`-o mountpoint=PATH\` is not recommended. Instead users
+  should prefer the \`--path PATH\` mountpoint option described above.
+
+SEE ALSO
+  zfs-create(8), zfs-set(8), zfsprops(8)
+EOF
 
   exit ${1:-0}
 }
