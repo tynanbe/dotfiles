@@ -1,0 +1,345 @@
+#!/usr/bin/env sh
+
+# zfsmp - ZFS Mountpoint
+#
+# A convenient wrapper for working with ZFS mountpoints.
+#
+#   - Create a ZFS filesystem, and optionally its parents, as needed.
+#   - Backup and preserve files if the mountpoint already exists.
+#   - Set the ZFS filesystem's mountpoint.
+#
+
+
+usage() {
+  echo "${name} - ZFS Mountpoint"
+  echo
+  echo "A convenient wrapper for working with ZFS mountpoints."
+  echo
+  echo "  - Create a ZFS filesystem, and optionally its parents, as needed."
+  echo "  - Backup and preserve files if the mountpoint already exists."
+  echo "  - Set the ZFS filesystem's mountpoint."
+  echo
+  echo "USAGE:"
+  echo "  ${name} [OPTIONS] FILESYSTEM"
+  echo
+  echo "  All options and their arguments must be space-delimited; other formats --"
+  echo "  e.g. \`-fN\`, \`-P/home\`, \`--path=run\`, etc. -- are not supported."
+  echo
+  echo "GENERAL OPTIONS:"
+  echo "  --                    end options"
+  echo "  -f, --force           never prompt"
+  echo "  -h, --help            show list of command-line options"
+  echo
+  echo "  Use \"--\" to indicate that all following arguments are non-options."
+  echo
+  echo "  The \`--force\` option assumes affirmative intent in situations where the"
+  echo "  user would normally be prompted about FILESYSTEM creation or backup removal."
+  echo
+  echo "MOUNTPOINT OPTIONS:"
+  echo "  -I, --inherit         unset the ZFS mountpoint"
+  echo "  -L, --legacy          set the ZFS mountpoint to \"legacy\""
+  echo "  -N, --none            set the ZFS mountpoint to \"none\""
+  echo "  -P PATH, --path PATH  set the ZFS mountpoint to PATH"
+  echo
+  echo "  Mountpoint options are mutually exclusive."
+  echo
+  echo "  If PATH is not absolute, it will be made so before use."
+  echo
+  echo "  Omitting all mountpoint options is equivalent to using \`--path PATH\`,"
+  echo "  where PATH is the FILESYSTEM argument with the zpool name removed."
+  echo
+  echo "  Example:"
+  echo "    \`${name} rpool/home\`"
+  echo "    equates to"
+  echo "    \`${name} --path /home rpool/home\`"
+  echo
+  echo "META OPTIONS:"
+  echo "  -M MODE, --mode MODE    apply \`chmod MODE\` to the mountpoint"
+  echo "  -O [OWNER][:[GROUP]], --own [OWNER][:[GROUP]]"
+  echo "                          apply \`chown [OWNER][:[GROUP]]\` to the mountpoint"
+  echo
+  echo "  Meta options cannot be used together with any of the following options:"
+  echo "    --inherit (-I)"
+  echo "    --legacy (-L)"
+  echo "    --none (-N)"
+  echo
+  echo "ZFS-CREATE OPTIONS:"
+  echo "  -o property=value [...]   set one or more ZFS properties"
+  echo "  -p, --parents             create any non-existing parent datasets"
+  echo
+  echo "  \`zfs create\` is only invoked on an as-needed basis."
+  echo "  As such, zfs-create options have no effect if FILESYSTEM already exists."
+  echo
+  echo "  Multiple \`-o property=value\` options can be specified."
+  echo
+  echo "  Note that using \`-o mountpoint=PATH\` is not recommended. Instead users"
+  echo "  should prefer the \`--path PATH\` mountpoint option described above."
+  echo
+  echo "SEE ALSO"
+  echo "  zfs-create(8), zfs-set(8), zfsprops(8)"
+
+  exit ${1:-0}
+}
+
+
+name=$(
+  basename -- "${0}"
+)
+
+
+test -n "${1}" \
+|| usage
+
+
+bak=
+help=
+filesystem=
+force=
+inherit=
+legacy=
+mode=
+none=
+options=
+own=
+parents=
+path=
+
+
+# Options
+
+while test 0 -lt ${#}; do
+  item="${1}"
+
+  case "${item}" in
+    --)
+      shift
+
+      filesystem="${@}"
+
+      break
+    ;;
+
+    --force|-f)
+      force="--force (-f)"
+    ;;
+
+    --help|-h)
+      help="--help (-h)"
+    ;;
+
+    --inherit|-I)
+      inherit="--inherit (-I)"
+    ;;
+
+    --legacy|-L)
+      legacy="--legacy (-L)"
+    ;;
+
+    --mode|-M)
+      shift
+
+      mode="${1}"
+    ;;
+
+    --none|-N)
+      none="--none (-N)"
+    ;;
+
+    -o)
+      shift
+
+      options="${options} -o ${1}"
+    ;;
+
+    --own|-O)
+      shift
+
+      own="${1}"
+    ;;
+
+    --parents|-p)
+      parents="--parents (-p)"
+    ;;
+
+    --path|-P)
+      shift
+
+      path="${1}"
+    ;;
+
+    *)
+      if test 1 -eq ${#} \
+      -a "$(basename -- "${item}")" != "${item}"; then
+        filesystem="${item}"
+      else
+        echo "Unknown argument ${item}"
+
+        exit 1
+      fi
+    ;;
+  esac
+
+  if test 0 -lt ${#}; then
+    shift
+  else
+    echo "Missing argument for option ${item}"
+
+    exit 1
+  fi
+done
+
+
+test -z "${help}" \
+|| usage
+
+
+if test -z "${filesystem}"; then
+  echo "Missing FILESYSTEM argument"
+
+  exit 1
+fi
+
+
+conflicts=$(
+  printf "%s" \
+    "${inherit}" \
+    "${legacy}" \
+    "${mode}" \
+    "${none}" \
+    "${own}" \
+    "${path}"
+)
+
+for item in "${inherit}" "${legacy}" "${none}"; do
+  test -n "${item}" \
+  || continue
+
+  if test "${conflicts}" != "${item}"; then
+    echo "One or more options conflict with option ${item}"
+
+    exit 1
+  fi
+done
+
+
+_printf() {
+  printf "\n%s\n" "${1}"
+}
+
+
+prompt() {
+  printf "\n%s " "${1} and proceed (y/N)?"
+
+  if test -n "${force}"; then
+    answer="Yes"
+
+    echo "${answer}"
+  else
+    read answer
+  fi
+
+  if test "${answer#[Yy]}" != "${answer}"; then
+    sh -c "${2}" \
+    || exit 1
+  else
+    _printf "Abort"
+
+    exit 1
+  fi
+}
+
+
+zfs list -- "${filesystem}" > /dev/null \
+|| prompt "Create ${filesystem}" \
+    "zfs create ${options} ${parents:+-p} -- '${filesystem}'"
+
+
+if test -n "${inherit}"; then
+  zfs inherit mountpoint "${filesystem}" \
+  && _printf "Unset (inherited) mountpoint for ${filesystem}"
+
+  exit 0
+elif test -n "${legacy}"; then
+  zfs set mountpoint=legacy "${filesystem}" \
+  && _printf "Set mountpoint to \"legacy\" for ${filesystem}"
+
+  exit 0
+elif test -n "${none}"; then
+  zfs set mountpoint=none "${filesystem}" \
+  && _printf "Set mountpoint to \"none\" for ${filesystem}"
+
+  exit 0
+fi
+
+
+test -n "${path}" \
+|| path=$(
+    echo "${filesystem}" \
+    | sed -E 's,^[^/]+,,'
+  )
+
+path=$(
+  realpath --no-symlinks -- "${path}"
+)
+
+
+safe_cp() {
+  commands=$(
+    printf "%s " \
+      "cd -- '${1}'" \
+      "&& mkdir -p -- '${2}'" \
+      "&& bsdtar cf - ." \
+        "| bsdtar xvf - -C '${2}'"
+  )
+
+  _printf "Copy files from ${1} to ${2}"
+
+  sh -c "${commands}"
+}
+
+
+if test -d "${path}"; then
+  bak="${path}.bak"
+
+  if test -d "${bak}"; then
+    _printf "Pre-existing backup found at ${bak}"
+
+    prompt "Remove ${bak}" \
+      "rm -rf -- '${bak}'"
+  fi
+
+  if mv -- "${path}" "${bak}" 2> /dev/null; then
+    _printf "Move ${path} to ${bak}"
+  else
+    safe_cp "${path}" "${bak}"
+  fi
+fi
+
+
+if zfs set mountpoint="${path}" "${filesystem}"; then
+  _printf "Mount ${filesystem} in ${path}"
+else
+  exit 1
+fi
+
+
+test -z "${bak}" \
+|| safe_cp "${bak}" "${path}"
+
+
+test -z "${mode}" \
+|| chmod "${mode}" -- "${path}"
+
+
+test -z "${own}" \
+|| chown "${own}" -- "${path}"
+
+
+_printf "ZFS" \
+&& zfs list -- "${filesystem}"
+
+_printf "MOUNTPOINT" \
+&& ls -dhl -- "${path}"
+
+_printf "CONTENTS" \
+&& ls -Ahl -- "${path}"
