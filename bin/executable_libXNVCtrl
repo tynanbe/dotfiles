@@ -1,0 +1,48 @@
+#!/usr/bin/env sh
+
+# libXNVCtrl - Update /usr/lib/libXNVCtrl.a
+#
+# https://github.com/NVIDIA/nvidia-settings.git
+#
+
+
+commands=$(
+  printf "%s " \
+    "cd '${HOME}/src/nvidia-settings/'" \
+    "&& git fetch origin"
+)
+
+
+if test -z "${1}"; then
+  echo "Please provide an NVIDIA driver version (tag)"
+
+  commands=$(
+    printf "%s " \
+      "${commands}" \
+      "&& printf '\n%s ' 'Show tags (Y/n)?'" \
+      "&& read answer" \
+      '&& test "${answer#[Nn]}" = "${answer}"' \
+      "&& git tag --list"
+  )
+
+  sh -c "${commands}"
+
+  exit 1
+fi
+
+
+tag="${1}"
+
+commands=$(
+  printf "%s " \
+    "${commands}" \
+    "&& git checkout '${tag}'" \
+    "&& git pull origin '${tag}' --rebase" \
+    "&& git submodule update --init" \
+    "&& cd './src/libXNVCtrl/'" \
+    "&& make" \
+    "&& sudo cp './_out/Linux_x86_64/libXNVCtrl.a' '/usr/lib/'" \
+    "&& rm -rf './_out'"
+)
+
+sh -c "${commands}"
