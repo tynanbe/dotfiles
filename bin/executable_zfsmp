@@ -31,15 +31,15 @@ GENERAL OPTIONS:
   -f, --force           never prompt
   -h, --help            show list of command-line options
 
-  Use \"--\" to indicate that all following arguments are non-options.
+  Use \`--\` to indicate that all following arguments are non-options.
 
   The \`--force\` option assumes affirmative intent in situations where the
   user would normally be prompted about FILESYSTEM creation or backup removal.
 
 MOUNTPOINT OPTIONS:
   -I, --inherit         unset the ZFS mountpoint
-  -L, --legacy          set the ZFS mountpoint to \"legacy\"
-  -N, --none            set the ZFS mountpoint to \"none\"
+  -L, --legacy          set the ZFS mountpoint to "legacy"
+  -N, --none            set the ZFS mountpoint to "none"
   -P PATH, --path PATH  set the ZFS mountpoint to PATH
 
   Mountpoint options are mutually exclusive.
