@@ -253,7 +253,7 @@ prompt() {
 
 zfs list -- "${filesystem}" > /dev/null \
 || prompt "Create ${filesystem}" \
-    "zfs create ${options} ${parents:+-p} -- '${filesystem}'"
+    "zfs create -o mountpoint=none ${options} ${parents:+-p} -- '${filesystem}'"
 
 
 if test -n "${inherit}"; then
@@ -280,9 +280,10 @@ test -n "${path}" \
     | sed -E 's,^[^/]+,,'
   )
 
-path=$(
-  realpath --no-symlinks -- "${path}"
-)
+test ! -e "${path}" \
+|| path=$(
+    realpath --no-symlinks -- "${path}"
+  )
 
 
 safe_cp() {
@@ -303,7 +304,7 @@ safe_cp() {
 if test -d "${path}"; then
   bak="${path}.bak"
 
-  if test -d "${bak}"; then
+  if test -e "${bak}"; then
     _printf "Pre-existing backup found at ${bak}"
 
     prompt "Remove ${bak}" \
