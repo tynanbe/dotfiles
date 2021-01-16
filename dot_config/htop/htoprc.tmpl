@@ -1,3 +1,6 @@
+{{ $oak := eq "oak" .chezmoi.hostname -}}
+
+
 # Beware! This file is rewritten by htop when settings are changed in the interface.
 # The parser is also very primitive, and not human-friendly.
 fields=0 48 17 18 38 2 46 47 49 1
@@ -27,44 +30,12 @@ account_guest_in_cpu_meter=0
 color_scheme=0
 enable_mouse=1
 delay=15
-left_meters=AllCPUs
-
-{{- if (eq "oak" .chezmoi.hostname) -}}
-  {{- "2" -}}
-{{- end -}}
-
-{{- " Memory Swap" -}}
-
-{{- if (ne "oak" .chezmoi.hostname) -}}
-  {{- " Hostname" -}}
-{{- end -}}
-
-{{""}}
-left_meter_modes=1 1 1
-
-{{- if (ne "oak" .chezmoi.hostname) -}}
-  {{- " 2" -}}
-{{- end -}}
-
-{{""}}
+left_meters=AllCPUs{{ $oak | ternary "2 " " " -}}
+  Memory Swap
+  {{- not $oak | ternary " Hostname" "" }}
+left_meter_modes=1 1 1 {{- not $oak | ternary " 2" "" }}
 right_meters=Tasks LoadAverage Uptime
-
-{{- if (eq "oak" .chezmoi.hostname) -}}
-  {{- " Blank" -}}
-{{- else -}}
-  {{- " Battery" -}}
-{{- end -}}
-
-{{- " Clock" -}}
-
-{{- if (eq "oak" .chezmoi.hostname) -}}
-  {{- " Hostname" -}}
-{{- end -}}
-
-{{""}}
-right_meter_modes=2 2 2 2 2
-{{- if (eq "oak" .chezmoi.hostname) -}}
-  {{- " 2" -}}
-{{- end -}}
-
-{{""}}
+  {{- $oak | ternary " Blank " " Battery " -}}
+  Clock
+  {{- $oak | ternary " Hostname" "" }}
+right_meter_modes=2 2 2 2 2 {{- $oak | ternary " 2" "" }}
