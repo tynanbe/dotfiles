@@ -1,4 +1,4 @@
-{{ $libc := (eq "oak" .chezmoi.hostname) | ternary "gnu" "musl" -}}
+{{ $libc := eq "oak" .chezmoi.hostname | ternary "gnu" "musl" -}}
 
 
 default_host_triple = "x86_64-unknown-linux-{{ $libc }}"
