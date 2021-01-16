@@ -1,13 +1,8 @@
-default_host_triple = "x86_64-unknown-linux-
+{{ $libc := (eq "oak" .chezmoi.hostname) | ternary "gnu" "musl" -}}
 
-{{- if (eq "oak" .chezmoi.hostname) -}}
-  {{- "gnu" -}}
-{{- else -}}
-  {{- "musl" -}}
-{{- end -}}
 
-{{""}}"
-default_toolchain = "nightly"
+default_host_triple = "x86_64-unknown-linux-{{ $libc }}"
+default_toolchain = "nightly-x86_64-unknown-linux-{{ $libc }}"
 profile = "default"
 version = "12"
 
