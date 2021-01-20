@@ -3,7 +3,7 @@ deno 1.6.2
 elixir system
 elm 0.19.1
 erlang system
-gleam 0.12.1
+gleam 0.13.2
 golang system
 haskell system
 java system
