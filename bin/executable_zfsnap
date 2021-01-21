@@ -25,7 +25,7 @@ label=$(
 )
 
 
-sudo zfs snapshot -r "${1}"
+zfs snapshot -r "${1}"
 
 
 set +e
@@ -37,7 +37,7 @@ for fs in $(
   | sed -E 's/\t(false|none)$//' \
   | uniq
 ); do
-  sudo zfs destroy -v "${fs}@${label}"
+  zfs destroy -v "${fs}@${label}"
 done
 
 
