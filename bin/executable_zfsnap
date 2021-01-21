@@ -1,0 +1,44 @@
+#!/usr/bin/env sh
+
+# zfsnap - recursively snapshot the ZFS filesystem,
+#          remove snapshots where com.sun:auto-snapshot=false or mountpoint=none
+#
+# USAGE:
+#   zfsnap <filesystem>@<label>
+#
+
+
+set -e
+
+
+test -n "${1}"
+
+
+filesystem=$(
+  echo "${1}" \
+  | sed -E 's/([^@]+)@.+/\1/'
+)
+
+label=$(
+  echo "${1}" \
+  | sed -E 's/[^@]+@(.+)/\1/'
+)
+
+
+sudo zfs snapshot -r "${1}"
+
+
+set +e
+
+for fs in $(
+  zfs get -H -o name,value com.sun:auto-snapshot,mountpoint -r "${filesystem}" \
+  | rg -v '@' \
+  | rg '\t(false|none)$' \
+  | sed -E 's/\t(false|none)$//' \
+  | uniq
+); do
+  sudo zfs destroy -v "${fs}@${label}"
+done
+
+
+exit 0
