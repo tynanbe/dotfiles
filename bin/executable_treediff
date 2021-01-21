@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+
+# treediff - recursively find files that one dir is missing,
+#            when compared with a second dir
+#
+# USAGE:
+# treediff <PATH1> <PATH2>
+#
+# see: https://stackoverflow.com/a/40986505
+#
+# TODO: rclone?
+#
+
+
+rsync --dry-run --recursive --delete --links --verbose "${1}" "${2}" \
+| rg '^deleting (?!.asdf|.cache|.cargo|.config/chromium|.*.git|.rustup)' --pcre2 \
+| sed 's/deleting //' \
+| bp
