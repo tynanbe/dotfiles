@@ -1,0 +1,7 @@
+#!/usr/bin/env -S sh -e
+
+(
+  cd "${1}"
+  shift
+  "${@}"
+)
