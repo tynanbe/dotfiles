@@ -9,40 +9,232 @@
 #   ls [OPTIONS] [<PATHS>]
 #
 
+# Environment Variable Settings
+#
+LS_FORMAT="${LS_FORMAT-long}"
+LS_INDICATORS="${LS_INDICATORS-classify}"
+LS_PERMISSIONS="${LS_PERMISSIONS-octal}"
 
-long_opts() {
-  while test 0 -lt ${#}; do
-    case "${1}" in
-      -1|--oneline|-G|--grid|-x|--across)
-        return 0
-        ;;
-    esac
+# Argument Preparation
+#
+args="${@}"
+set --
 
-    shift
-  done
+# Compound Options
+#
+opt_type="none"
 
-  printf "%s " \
-    --long \
-    --group \
-    --time-style=iso
+format_opt() {
+  case "${1}" in
+    1|oneline|single-column) set -- --oneline;;
+    C|G|grid|vertical) set -- --grid;;
+    l|o|long|verbose) set -- --long;;
+    T|tree) set -- --tree;;
+    x|across|horizontal) set -- --across;;
+  esac
+  echo "${1}"
 }
 
+indicator_opt() {
+  case "${1}" in
+    none) set --;;
+    classify|file-type|slash) set -- --classify;;
+  esac
+  echo "${1}"
+}
 
-args=$(
-  if test 0 -lt ${#}; then
-    printf '"%s" ' "${@}" \
-      | sed -E \
-        -e 's/"--almost-all"|"-A"|("-[^"-A]*)A/\1/' \
-        -e 's/"--human-readable"//' \
-        -e 's/--directory/--list-dirs/'
+sort_opt() {
+  case "${1}" in
+    version) set --;;
+    *) set -- "--sort=${1}";;
+  esac
+  echo "${1}"
+}
+
+time_opt() {
+  case "${1}" in
+    access|atime|use) set -- "accessed";;
+    ctime|status) set -- "changed";;
+    birth|creation) set -- "created";;
+    *) set -- "${1}";;
+  esac
+  echo "--time=${1}"
+}
+
+# Argument Handling
+#
+system_ls="false"
+for arg in ${args}; do
+  if test "${opt_type}" = "discard"; then
+    opt_type="none"
+    continue
+  elif test "${opt_type}" = "width"; then
+    opt_type="none"
+    export COLUMNS="${arg}"
+    continue
+  elif test "${opt_type}" != "none"; then
+    arg="$("${opt_type}_opt" "${arg}")"
+    opt_type="none"
+    test -z "${arg}" \
+    || set -- "${@}" "${arg}"
+  elif test -z "${arg##--*}"; then
+    arg="${arg#--}"
+    case "${arg}" in
+      classify|dereference|file-type)
+        LS_INDICATORS=""
+        arg="classify"
+      ;;
+      directory) arg="list-dirs";;
+      format)
+        LS_FORMAT=""
+        opt_type="format"
+        continue
+      ;;
+      format=*)
+        LS_FORMAT=""
+        arg="$(format_opt "${arg#*=}")"
+      ;;
+      across|grid|horizontal|long|oneline|single-column|tree|verbose|vertical)
+        LS_FORMAT=""
+        arg="$(format_opt "${arg}")"
+      ;;
+      full-time)
+        LS_FORMAT=""
+        set -- "${@}" --long --time-style=full-iso
+        continue
+      ;;
+      human-readable) arg="binary";;
+      indicator-style)
+        LS_INDICATORS=""
+        opt_type="indicator"
+        continue
+      ;;
+      indicator-style=*)
+        LS_INDICATORS=""
+        arg="$(indicator_opt "${arg#*=}")"
+      ;;
+      no-permissions|octal-permissions) LS_PERMISSIONS="";;
+      numeric-uid-gid)
+        LS_FORMAT=""
+        set -- "${@}" --long --numeric
+        continue
+      ;;
+      size)
+        LS_FORMAT=""
+        LS_PERMISSIONS=""
+        set -- "${@}" --long --no-permissions --no-time --no-user
+        continue
+      ;;
+      sort|time|width)
+        opt_type="${arg}"
+        continue
+      ;;
+      sort=*|time=*) arg="$("${arg%%=*}_opt" "${arg#*=}")";;
+      width=*)
+        export COLUMNS="${arg#*=}"
+        continue
+      ;;
+      hide)
+        # Discard arg and next arg
+        opt_type="discard"
+        continue
+      ;;
+      almost-all|hide=*|kibibytes|literal|no-group|show-control-chars|si)
+        # Discard
+        continue
+      ;;
+      author|block-size*|context|dereference*|dired|escape|hide-control-chars|hyperlink*|ignore-backups|quote-name|quoting-style*|tabsize*)
+        # Run system `ls` and exit
+        system_ls="true"
+      ;;
+    esac
+    test -z "${arg}" \
+    || set -- "${@}" "--${arg#--}"
+  elif test -z "${arg##-*}"; then
+    for arg in $(echo "${arg#-}" | fold --width=1); do
+      time=""
+      case "${arg}" in
+        1|C|G|l|o|T|x)
+          LS_FORMAT=""
+          set -- "${@}" "$(format_opt "${arg}")"
+          continue
+        ;;
+        c) time="changed";;
+        F|p)
+          LS_INDICATORS=""
+          arg="F"
+        ;;
+        f)
+          LS_FORMAT=""
+          set -- "${@}" --all --color=never --oneline --sort=none
+          continue
+        ;;
+        u) time="accessed";;
+        w)
+          opt_type="width"
+          continue
+        ;;
+        X)
+          set -- "${@}" --sort=extension
+          continue
+        ;;
+        A|k|N)
+          # Discard
+          continue
+        ;;
+        m|Q|q|Z)
+          # Run system `ls` and exit
+          system_ls="true"
+        ;;
+      esac
+      if test -n "${time}"; then
+        set -- "${@}" "--${time}" "--sort=${time}"
+      else
+        test -z "${arg}" \
+        || set -- "${@}" "-${arg}"
+      fi
+    done
+  else
+    set -- "${@}" "${arg}"
   fi
-)
 
+  if "${system_ls}"; then
+    if PATH="${TRUE_PATH:-/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin}" ls ${args}; then
+      exit 0
+    else
+      exit 1
+    fi
+  fi
+done
 
-sh -c "
-  exa \
-    --all \
-    --classify \
-    $(long_opts "${@}") \
-    ${args}
-"
+# Environment Variable Handling
+#
+if test -n "${LS_FORMAT}"; then
+  # Remove leading hyphen(s) from env var
+  LS_FORMAT="${LS_FORMAT#-}"
+  set -- "--${LS_FORMAT#-}" "${@}"
+fi
+
+if test -n "${LS_INDICATORS}"; then
+  # Remove leading hyphen(s) from env var
+  LS_INDICATORS="${LS_INDICATORS#-}"
+  set -- "--${LS_INDICATORS#-}" "${@}"
+fi
+
+if test -n "${LS_PERMISSIONS}"; then
+  # Remove leading hyphen(s) from env var
+  LS_PERMISSIONS="${LS_PERMISSIONS#-}"
+  case "${LS_PERMISSIONS#-}" in
+    octal*) set -- --no-permissions --octal-permissions "${@}";;
+    no*) set -- --no-permissions "${@}";;
+  esac
+fi
+
+# Default Arguments
+#
+set -- --all --git "${@}"
+
+# Command Invocation
+#
+export EXA_STRICT=""
+exa "${@}"
