@@ -2,7 +2,7 @@
 
 # ls - a modern replacement for ls
 #
-# A cross-platform alias with common options specified as the default.
+# A cross-platform alias with common default options.
 #
 #
 # USAGE:
@@ -15,15 +15,18 @@ LS_FORMAT="${LS_FORMAT-long}"
 LS_INDICATORS="${LS_INDICATORS-classify}"
 LS_PERMISSIONS="${LS_PERMISSIONS-octal}"
 
-# Argument Preparation
+# Variable Initialization
 #
 args="${@}"
+opt_type="none"
+system_ls="false"
+
+# Argument Initialization
+#
 set --
 
 # Compound Options
 #
-opt_type="none"
-
 format_opt() {
   case "${1}" in
     1|oneline|single-column) set -- --oneline;;
@@ -63,9 +66,10 @@ time_opt() {
 
 # Argument Handling
 #
-system_ls="false"
 for arg in ${args}; do
-  if test "${opt_type}" = "discard"; then
+  if "${system_ls}"; then
+    break
+  elif test "${opt_type}" = "discard"; then
     opt_type="none"
     continue
   elif test "${opt_type}" = "width"; then
@@ -144,8 +148,9 @@ for arg in ${args}; do
         continue
       ;;
       author|block-size*|context|dereference*|dired|escape|hide-control-chars|hyperlink*|ignore-backups|quote-name|quoting-style*|tabsize*)
-        # Run system `ls` and exit
+        # Run system `ls`
         system_ls="true"
+        break
       ;;
     esac
     test -z "${arg}" \
@@ -160,10 +165,7 @@ for arg in ${args}; do
           continue
         ;;
         c) time="changed";;
-        F|p)
-          LS_INDICATORS=""
-          arg="F"
-        ;;
+        F) LS_INDICATORS="";;
         f)
           LS_FORMAT=""
           set -- "${@}" --all --color=never --oneline --sort=none
@@ -182,9 +184,11 @@ for arg in ${args}; do
           # Discard
           continue
         ;;
-        m|Q|q|Z)
-          # Run system `ls` and exit
+        m|p|Q|q|Z)
+          # Keep `p` here for `completions/scp.fish`
+          # Run system `ls`
           system_ls="true"
+          break
         ;;
       esac
       if test -n "${time}"; then
@@ -197,15 +201,17 @@ for arg in ${args}; do
   else
     set -- "${@}" "${arg}"
   fi
-
-  if "${system_ls}"; then
-    if PATH="${TRUE_PATH:-/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin}" ls ${args}; then
-      exit 0
-    else
-      exit 1
-    fi
-  fi
 done
+
+# System `ls` Handling
+#
+if "${system_ls}"; then
+  if PATH="${TRUE_PATH:-/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin}" ls ${args}; then
+    exit 0
+  else
+    exit 1
+  fi
+fi
 
 # Environment Variable Handling
 #
@@ -236,5 +242,4 @@ set -- --all --git "${@}"
 
 # Command Invocation
 #
-export EXA_STRICT=""
-exa "${@}"
+EXA_STRICT="" exa "${@}"
