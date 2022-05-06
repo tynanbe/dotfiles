@@ -19,7 +19,11 @@ LS_PERMISSIONS="${LS_PERMISSIONS-octal}"
 #
 args="${@}"
 opt_type="none"
-system_ls="false"
+if ! qtype exa; then
+  system_ls="true"
+else
+  system_ls="false"
+fi
 
 # Argument Initialization
 #
@@ -206,7 +210,7 @@ done
 # System `ls` Handling
 #
 if "${system_ls}"; then
-  if PATH="${TRUE_PATH:-/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin}" ls ${args}; then
+  if PATH="${TRUE_PATH:-/opt/local/bin:/opt/local/sbin:/usr/bin:/bin:/usr/sbin:/sbin:/usr/local/bin:/usr/local/sbin:/data/data/com.termux/files/usr/bin}" ls ${args}; then
     exit 0
   else
     exit 1
